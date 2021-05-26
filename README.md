@@ -95,3 +95,11 @@ SPAD-calibrate -h
    Produce text files and detector signals as well as data files to collect statistics on this detector array and test the output.
    This parameter is optional. The default value is '0'.
 
+# Compilation
+
+Only tested on Windows 10 x64 compiled with Microsoft Visual Studio Community 2019.
+Use CMAKE and the CMakeLists.txt to create the solution/project, or try to use the sln file for Visual Studio from the build folder.
+TODO: Both the above depend on the prebuilt lib for libics. This would have to be built for another platform.
+
+ 
+

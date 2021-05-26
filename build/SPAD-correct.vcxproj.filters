@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-correct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-bin_width_factors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-binning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-corrections.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-timebase_scales.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-timebase_shifts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-correct_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-correct_metadata.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-correct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-correct_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\cmdparser.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{8C5A3536-97AF-325C-9610-FA08BC36DEB7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{E87846EB-4858-36E7-B681-DDAF1B575C9A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
