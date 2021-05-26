@@ -82,10 +82,10 @@ SPAD-calibrate -h
    Path to input ics file acquired with constant light source.
 
   -st   --start_bin     (required)
-   The first timebin to use from each signal. Usually 10 (UCL) or 40 (KCL).
+   The first timebin to use from each signal. Usually 10 or so.
 
   -sp   --stop_bin      (required)
-   The lasst timebin to use from each signal. Usually 245 (UCL) or 230 (KCL).
+   The lasst timebin to use from each signal. Usually 245 maybe, from 256 bins.
 
   -d    --delta
    The delay between peaks 1 and 2 in real time will be used to calbrate the time axis. If -1.0 (default) the median time from the data will be used.
