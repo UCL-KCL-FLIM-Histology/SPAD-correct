@@ -47,47 +47,46 @@ int SPAD_initialise_bin_width_factors(USHORT* histogram, int width, int height, 
 
     USHORT* pi = histogram; // ptr for summing
     double* factor = gBinWidthFactors;
+    int nPixels = width * height;
 
-    for (int i = 0; i < height; i++) {
-		for (int j = 0; j < width; j++) {
+    for (int i = 0; i < nPixels; i++) {
 
-			// Get one transient
-            for (int k = 0; k < timebins; k++) {
-                trans[k] = trans[k] + *pi;
-                pi++;
-            }
+		// Get one transient
+        for (int k = 0; k < timebins; k++) {
+            trans[k] = *pi;
+            pi++;
+        }
 
-			// Calculate mean of transient, to maintain time calibration this must be done over the bins between the 2 peaks of shift and scale data
-			double m = 0;
-			int p1 = (int)gPeak1Pos[i];
-			int p2 = (int)gPeak2Pos[i] + 1;
-			if (p1 > p2) {m = p1; p1 = p2; p2 = m; m = 0;}
-			UINT* p = &(trans[(start_bin)]);
-	//        for (int k = (start_bin); k < (stop_bin); k++) {
-			for (int k = p1; k < p2; k++) {
-					m = m + *p;
-				p++;
-			}
-	//        m = m / (double)(stop_bin - start_bin);
-			m = m / (double)(p2 - p1);
+		// Calculate mean of transient, to maintain time calibration this must be done over the bins between the 2 peaks of shift and scale data
+		double m = 0;
+		int p1 = (int)gPeak1Pos[i];
+		int p2 = (int)gPeak2Pos[i] + 1;
+		if (p1 > p2) {m = p1; p1 = p2; p2 = m; m = 0;}
+		UINT* p = &(trans[(start_bin)]);
+//        for (int k = (start_bin); k < (stop_bin); k++) {
+		for (int k = p1; k < p2; k++) {
+				m = m + *p;
+			p++;
+		}
+//        m = m / (double)(stop_bin - start_bin);
+		m = m / (double)(p2 - p1);
 
-			// Get factor for each bin of each detector, fill ends with 1.0
-			p = trans;
-			for (int k = 0; k < start_bin; k++) {
-				*factor = 1.0;
-				p++;
-				factor++;
-			}
-			for (int k = start_bin; k < stop_bin; k++) {
-				*factor = (double)(*p) / m;
-				p++;
-				factor++;
-			}
-			for (int k = stop_bin; k < timebins; k++) {
-				*factor = 1.0;
-				p++;
-				factor++;
-			}
+		// Get factor for each bin of each detector, fill ends with 1.0
+		p = trans;
+		for (int k = 0; k < start_bin; k++) {
+			*factor = 1.0;
+			p++;
+			factor++;
+		}
+		for (int k = start_bin; k < stop_bin; k++) {
+			*factor = (double)(*p) / m;
+			p++;
+			factor++;
+		}
+		for (int k = stop_bin; k < timebins; k++) {
+			*factor = 1.0;
+			p++;
+			factor++;
 		}
     }
 
@@ -165,7 +164,9 @@ int SPAD_dump_bin_width_factors_to_text_file(char filepath[], int width, int hei
     }
 
     double* f = gBinWidthFactors;
-    for (int i = 0; i < width * height; i++) {
+    int nPixels = width * height;
+
+    for (int i = 0; i < nPixels; i++) {
         fprintf(fp, "%f", *f);    // first entry without comma
         f++;
         for (int j = 1; j < timebins; j++) {

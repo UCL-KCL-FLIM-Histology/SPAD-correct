@@ -71,21 +71,19 @@ int SPAD_intialise_timebase_scales(USHORT* histogram, int width, int height, int
     double* scale = gTimebaseScales;
     USHORT* pi = histogram; // ptr for summing
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
+    for (int i = 0; i < gnTimebaseScales; i++) {
 
-			// Get one transient
-            for (int k = 0; k < timebins; k++) {
-                trans[k] = trans[k] + *pi;
-                pi++;
-            }
+		// Get one transient
+        for (int k = 0; k < timebins; k++) {
+            trans[k] = *pi;
+            pi++;
+        }
 
-			// Find the peak
-			double peak_time = find_peak(trans, timebins);
+		// Find the peak
+		double peak_time = find_peak(trans, timebins);
 
-			// store peak position
-			gPeak2Pos[i] = peak_time;
-		}
+		// store peak position
+		gPeak2Pos[i] = peak_time;
 	}
 	
     // Replace peak position with the delta between peak pos and 1st peak (stored in the shifts wrt the mean position m)
@@ -95,20 +93,20 @@ int SPAD_intialise_timebase_scales(USHORT* histogram, int width, int height, int
     double* p2 = gPeak2Pos;  // contains the peak 2 positions
     double* p1 = gPeak1Pos;  // contains the peak 1 positions
     double m = gTimebaseShifts[gnTimebaseShifts];   // extra val is mean pos m
-    for (int k = 0; k < width * height; k++) {
+    for (int k = 0; k < gnTimebaseScales; k++) {
         *p = fabs((*p2 - *p1));
         d = d + *p;
         p++;
         p1++;
         p2++;
     }
-    d = d / (double)(width * height);  // Calculate mean as estimate of delta - can be thrown off by skewed distribution
+    d = d / (double)(gnTimebaseScales);  // Calculate mean as estimate of delta - can be thrown off by skewed distribution
 
     d = median(gTimebaseScales, gnTimebaseScales); // Calculate medain as estimate of delta - better than the mean
 
-    // Calculate the required scale to apply each row (detector) and replace the value in gTimebaseScales
+    // Calculate the required scale to apply each detector and replace the value in gTimebaseScales
     // Use median / delta, if delta is large - store a smaller value to shrink transient when correcting, and vice versa
-    for (int k = 0; k < width * height; k++) {
+    for (int k = 0; k < gnTimebaseScales; k++) {
         gTimebaseScales[k] = d / gTimebaseScales[k];
     }
 
@@ -119,7 +117,7 @@ int SPAD_intialise_timebase_scales(USHORT* histogram, int width, int height, int
     }
 
     // If delta was provided, calculate the overall timebase scale and store as last element
-	int last = width * height;
+	int last = gnTimebaseScales;
     gTimebaseScales[last] = -1.0;
     if (delta > 0) {
         printf("Using peak delta of %.3f bins and calibrating to %.3f ns\n", d, delta);

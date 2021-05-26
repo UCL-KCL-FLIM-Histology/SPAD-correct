@@ -49,12 +49,12 @@ int check_timebase_shifts_space(int width, int height)
 	int nPixels = width * height;
 
     if (!gTimebaseShifts) {
-        gTimebaseShifts = (double*)malloc((nPixels + 1) * sizeof(double));  // one value for each row, which comes from 1 sensor
+        gTimebaseShifts = (double*)malloc((nPixels + 1) * sizeof(double));  // one value for each sensor
         gnTimebaseShifts = nPixels;
     }
 
     if (!gPeak1Pos) {
-        gPeak1Pos = (double*)malloc((nPixels + 1) * sizeof(double));  // one value for each row, which comes from 1 sensor
+        gPeak1Pos = (double*)malloc((nPixels + 1) * sizeof(double));  // one value for each sensor
     }
 
     if (gTimebaseShifts && gPeak1Pos)
@@ -86,33 +86,31 @@ int SPAD_intialise_timebase_shifts(USHORT* histogram, int width, int height, int
     double* shift = gTimebaseShifts;
     USHORT* pi = histogram; // ptr for summing
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
+    for (int i = 0; i < gnTimebaseShifts; i++) {
 
-			// Get one transient
-            for (int k = 0; k < timebins; k++) {
-                trans[k] = trans[k] + *pi;
-                pi++;
-            }
+		// Get one transient
+        for (int k = 0; k < timebins; k++) {
+            trans[k] = *pi;
+            pi++;
+        }
 
-			// Find the peak
-			double peak_time = find_peak(trans, timebins);
+		// Find the peak
+		double peak_time = find_peak(trans, timebins);
 
-			// store peak position
-			gPeak1Pos[i] = peak_time;
-		}
+		// store peak position
+		gPeak1Pos[i] = peak_time;
 	}
 
     // Find the average peak position
     double m = mean_shift(gPeak1Pos, width, height);
 
     // Calculate the required shift for each row (detector)
-    for (int k = 0; k < width * height; k++) {
+    for (int k = 0; k < gnTimebaseShifts; k++) {
         gTimebaseShifts[k] = gPeak1Pos[k] - m;
     }
 
     // store mean pos as last element
-    gTimebaseShifts[width * height] = m;
+    gTimebaseShifts[gnTimebaseShifts] = m;
 
     return(0);
 }
