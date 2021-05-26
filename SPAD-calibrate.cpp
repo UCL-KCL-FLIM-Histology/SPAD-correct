@@ -259,16 +259,6 @@ int main(int argc, char** argv)
 	IcsGetPosition(ip, 1, NULL, &xy_microns_per_pixel, NULL);
 	IcsClose(ip);
 
-	if (test_dump) {
-		char imagefile[] = "detector_whitesignal_before.ics";
-		SPAD_save3DICSfile(imagefile, image, h, 1, t, 5, NULL, 0, xy_microns_per_pixel, ns_per_bin);   // better to transpose 1xh array for TRI2
-	}
-
-
-	// SCREAMERS
-	// Leave this to be done elsewhere and provided as a text file list
-
-
 	// load p1 and p2 fresh to generate test files
 	free(image1);
 	free(image2);
@@ -297,14 +287,6 @@ int main(int argc, char** argv)
 
 	printf("Generate detector signals before and after correction...\n");
 	tStart = clock();
-
-	if (test_dump) {
-		// Output some images to demonstrate before condition
-		add_images(image1, image2, image, w, h, t);
-
-		char imagefile1[] = "detector_peaks_before.ics";
-		SPAD_save3DICSfile(imagefile1, image, h, 1, t, 5, NULL, 0, xy_microns_per_pixel, ns_per_bin);   // better to transpose 1xh array for TRI2
-	}
 
 	printf("Correcting p1 image...\n");
 	SPAD_CorrectTransients(image1, w, h, t);
@@ -337,7 +319,7 @@ int main(int argc, char** argv)
 		add_images(image1, image2, image, w, h, t);
 
 		char imagefile2[] = "detector_peaks_after.ics";
-		SPAD_save3DICSfile(imagefile2, image, h, 1, t, 5, NULL, 0, xy_microns_per_pixel, SPAD_get_calibrated_timebase());   // better to transpose 1xh array for TRI2
+		SPAD_save3DICSfile(imagefile2, image, w, h, t, 5, NULL, 0, xy_microns_per_pixel, SPAD_get_calibrated_timebase());
 	}
 
 	printf(" time taken: %.2fs\n", ((double)clock() - (double)tStart) / CLOCKS_PER_SEC);
