@@ -108,6 +108,17 @@ int SPAD_intialise_timebase_scales(USHORT* histogram, int width, int height, int
     // Use median / delta, if delta is large - store a smaller value to shrink transient when correcting, and vice versa
     for (int k = 0; k < gnTimebaseScales; k++) {
         gTimebaseScales[k] = d / gTimebaseScales[k];
+
+        // Check for valid/sensible value, hope bad values are few and they do not effect the median value
+        if (gTimebaseScales[k] > timebins) {
+            printf("Warning: Detector %d scale is too big, %.3f, has been set to 1.0\n", k, gTimebaseScales[k]);
+            gTimebaseScales[k] = 1.0;
+        }
+        else if (gTimebaseScales[k] < 1.0/(double)timebins) {
+            printf("Warning: Detector %d scale is too small, %.3f, has been set to 1.0\n", k, gTimebaseScales[k]);
+            gTimebaseScales[k] = 1.0;
+        }
+
     }
 
     // Rescale the shifts

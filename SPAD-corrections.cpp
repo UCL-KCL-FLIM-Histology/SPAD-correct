@@ -112,15 +112,17 @@ USHORT* combined_correction(USHORT* trans, int nbins,
         t = t - f;
         n = n - N;
 
-        while (j < bj2) {
-            f = 1; // whole
-            p = f / t;
-            N = rbinom(n, p);
-            if (j >= 0 && j < nbins)
-                new_Int[j] += N;
-            j = j + 1;
-            t = t - f;
-            n = n - N;
+        if (bj2 >= 0) {   // if upper bin limit is before the transient there is nothing to do
+            while (j < bj2) {
+                f = 1; // whole
+                p = f / t;
+                N = rbinom(n, p);
+                if (j >= 0 && j < nbins)
+                    new_Int[j] += N;
+                j = j + 1;
+                t = t - f;
+                n = n - N;
+            }
         }
 
         //p = 1; # remainder
@@ -196,16 +198,19 @@ void thread_correct(void* param)
     trans = &(image[start * width * timebins]);   // init to first transient
     bin_width_factors = &(gBinWidthFactors[start * timebins]);  // init to factors for first pixel
 
+    int k = start * width;  // index into gTimebaseShifts and gTimebaseScales
+
     for (int i = start; i < stop; i++) {
         for (int j = 0; j < width; j++) {
 
 			// calculate the bin borders for transient in this pixel
 			double* bin_borders;
 			int* bin_jindexes;
-			calc_bin_borders(bin_width_factors, timebins, gTimebaseShifts[i], gTimebaseScales[i], &bin_borders, &bin_jindexes);
+			calc_bin_borders(bin_width_factors, timebins, gTimebaseShifts[k], gTimebaseScales[k], &bin_borders, &bin_jindexes);
 
             correct_transient(trans, timebins, bin_borders, bin_jindexes);
             trans += timebins; // next transient
+            k++;
 
 			free(bin_borders);
 			free(bin_jindexes);
@@ -234,6 +239,9 @@ int SPAD_CorrectTransients(USHORT* image, int width, int height, int timebins)
     int rows_per_thread = height / nThreads;
     int i;
 
+    // DEBUG with single thread
+    //return (SPAD_CorrectTransients_SingleThread(image, width, height, timebins));
+
     if (!gBinWidthFactors && !gTimebaseShifts && !gTimebaseScales) {
         printf("Warning: No calibration set, nothing to do!\n");
         return (0);
@@ -246,11 +254,12 @@ int SPAD_CorrectTransients(USHORT* image, int width, int height, int timebins)
     // Seed random number generation
     srand((unsigned int)time(NULL));
 
+    clock_t tStart = clock();
     printf("Starting %d threads\n", nThreads);
     for (i = 0; i < nThreads - 1; i++) {
 
         info[i].image = image;
-        info[i].width = height;
+        info[i].width = width;
         info[i].height = height;
         info[i].timebins = timebins;
         info[i].start_row = rows_per_thread * i;
@@ -261,7 +270,7 @@ int SPAD_CorrectTransients(USHORT* image, int width, int height, int timebins)
 
     // Last thread gets remaining rows
     info[i].image = image;
-    info[i].width = height;
+    info[i].width = width;
     info[i].height = height;
     info[i].timebins = timebins;
     info[i].start_row = rows_per_thread * i;
@@ -270,18 +279,18 @@ int SPAD_CorrectTransients(USHORT* image, int width, int height, int timebins)
     hThread[i] = (HANDLE)_beginthread(thread_correct, 0, &info[i]);
 
     // Wait for threads to end
-    printf("Finished threads:    ");
-    for (i = 0; i < nThreads; i++) {
-        WaitForSingleObject(hThread[i], 10000);
-        printf("\b\b\b%3d", i+1);
+    DWORD ret = WaitForMultipleObjects(nThreads, hThread, TRUE, ULONG_MAX);   // wait for as long as we can
+    if (ret == WAIT_TIMEOUT) {
+        printf("ERROR: THREAD TIMEOUT\n");
+        return(-1);
     }
-    printf("\n");
+    printf("Finished threads: %.2fs\n", ((double)clock() - (double)tStart) / CLOCKS_PER_SEC);
 
     return(0);
 }
 
 
-int SPAD_CorrectTransients_SingleThread(USHORT* image, int width, int height, int timebins, double ns_per_bin)
+int SPAD_CorrectTransients_SingleThread(USHORT* image, int width, int height, int timebins)
 {
     USHORT* trans = NULL;
     double* bin_width_factors = NULL;
@@ -296,15 +305,18 @@ int SPAD_CorrectTransients_SingleThread(USHORT* image, int width, int height, in
     // Seed random number generation
     srand((unsigned int)time(NULL));
 
+    int k = 0;  // index into gTimebaseShifts and gTimebaseScales
+
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
 
 			double* bin_borders;
 			int* bin_jindexes;
-			calc_bin_borders(bin_width_factors, timebins, gTimebaseShifts[i] / ns_per_bin, gTimebaseScales[i], &bin_borders, &bin_jindexes);
+			calc_bin_borders(bin_width_factors, timebins, gTimebaseShifts[k], gTimebaseScales[k], &bin_borders, &bin_jindexes);
 
             correct_transient(trans, timebins, bin_borders, bin_jindexes);
             trans += timebins; // next transient
+            k++;
 
 			free(bin_borders);
 			free(bin_jindexes);

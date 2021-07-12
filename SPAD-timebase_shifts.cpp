@@ -104,9 +104,20 @@ int SPAD_intialise_timebase_shifts(USHORT* histogram, int width, int height, int
     // Find the average peak position
     double m = mean_shift(gPeak1Pos, width, height);
 
-    // Calculate the required shift for each row (detector)
+    // Calculate the required shift for each detector
     for (int k = 0; k < gnTimebaseShifts; k++) {
         gTimebaseShifts[k] = gPeak1Pos[k] - m;
+
+        // Check for valid/sensible value, hope that bad values are few as if they may effect the mean if there are lots - not correcting for that.
+        if (gTimebaseShifts[k] > timebins) {
+            printf("Warning: Detector %d shift is too big, %.3f, has been set to zero.\n", k, gTimebaseShifts[k]);
+            gTimebaseShifts[k] = 0.0;
+        }
+        else if (gTimebaseShifts[k] < -timebins) {
+            printf("Warning: Detector %d shift is too small, %.3f, has been set to zero.\n", k, gTimebaseShifts[k]);
+            gTimebaseShifts[k] = 0.0;
+        }
+
     }
 
     // store mean pos as last element

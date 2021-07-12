@@ -379,8 +379,7 @@ extern "C" {
 	\return Error code.
 	*/
 	__declspec(dllexport) int SPAD_CorrectTransients(USHORT* image, int width, int height, int timebins);
-
-
+	int SPAD_CorrectTransients_SingleThread(USHORT* image, int width, int height, int timebins);
 
 
 

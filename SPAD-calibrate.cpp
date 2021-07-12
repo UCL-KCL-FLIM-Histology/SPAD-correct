@@ -289,7 +289,12 @@ int main(int argc, char** argv)
 	tStart = clock();
 
 	printf("Correcting p1 image...\n");
+	
 	SPAD_CorrectTransients(image1, w, h, t);
+
+	//SPAD_CorrectTransients_SingleThread(image1, w, h, t);
+
+
 	printf("Correcting p2 image...\n");
 	SPAD_CorrectTransients(image2, w, h, t);
 
