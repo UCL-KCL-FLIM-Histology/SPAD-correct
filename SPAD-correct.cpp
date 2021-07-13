@@ -189,7 +189,8 @@ int process(const char* path, const char* filename, cli::Parser& parser)
     printf("SPAD_CorrectTransients...");
     tStart = clock();
     if (SPAD_CorrectTransients(image, w, h, t) < 0) {
-        free(image);
+    //if (SPAD_CorrectTransients_SingleThread(image, w, h, t) < 0) {
+            free(image);
         return(-3);
     }
     printf(" time taken: %.3fs\n", ((double)clock() - (double)tStart) / CLOCKS_PER_SEC);
@@ -261,7 +262,7 @@ int main(int argc, char** argv)
         const char *filename = list[i].c_str();
         printf("%zd/%zd: %s\n", i+1, count, filename);
         if (process(path, filename, parser) < 0)
-            break;   // error occurred
+            continue;   // error occurred
     }
 
     return(0);

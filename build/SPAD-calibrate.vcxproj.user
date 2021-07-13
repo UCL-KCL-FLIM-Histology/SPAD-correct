@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-p1 "D:\Images\Jakub - Quanticam\IRF2cableLengths\IRF2.5m.ics" -p2 "D:\Images\Jakub - Quanticam\IRF2cableLengths\IRF2.0m.ics" -w "D:\Images\Jakub - Quanticam\IRF2cableLengths\CDM.ics" -st 3630 -sp 4095 -t</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-p1 "D:\Images\Jakub - Quanticam\IRF2cableLengths\IRF2.5m.ics" -p2 "D:\Images\Jakub - Quanticam\IRF2cableLengths\IRF2.0m.ics" -w "D:\Images\Jakub - Quanticam\IRF2cableLengths\CDM.ics" -st 3630 -sp 4095</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

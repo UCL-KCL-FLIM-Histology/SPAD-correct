@@ -36,6 +36,7 @@
     <ClInclude Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\cmdparser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\SPAD-calibrate.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\CMakeLists.txt" />

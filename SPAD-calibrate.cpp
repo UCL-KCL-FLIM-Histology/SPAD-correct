@@ -143,7 +143,44 @@ int main(int argc, char** argv)
 		printf("ERROR: %d\n", ret);
 		return(-2);
 	}
-	else {
+	
+	// Correct for the bwf first to get more accurate peak positions
+	SPAD_reset_timebase_shifts(w, h, t);
+	SPAD_reset_timebase_scales(w, h);
+	printf("Correcting p1 image...\n");
+	SPAD_CorrectTransients(image1, w, h, t);
+	printf("Correcting p2 image...\n");
+	SPAD_CorrectTransients(image2, w, h, t);
+
+	// Now do shifts again on bwf corrected data for accurate peak positions
+	printf("SPAD_intialise_timebase_shifts...");
+	tStart = clock();
+	ret = SPAD_intialise_timebase_shifts(image1, w, h, t);
+	printf(" time taken: %.2fs\n", ((double)clock() - (double)tStart) / CLOCKS_PER_SEC);
+	//free(image1);
+
+	if (ret < 0) {
+		printf("ERROR: %d\n", ret);
+		return(-2);
+	}
+	
+	// Now do scales again on bwf corrected data for accurate peak positions
+	printf("SPAD_intialise_timebase_scales...");
+	tStart = clock();
+	ret = SPAD_intialise_timebase_scales(image2, w, h, t, delta);
+	printf(" time taken: %.2fs\n", ((double)clock() - (double)tStart) / CLOCKS_PER_SEC);
+	//free(image2);
+
+	if (ret < 0) {
+		printf("ERROR: %d\n", ret);
+		return(-2);
+	}
+
+	free(image1);
+	free(image2);
+
+	// Save dat files now that calibration has been done
+	{
 		char datafile[] = "binwidth_factors.dat";
 		printf("SPAD_write_bin_width_factors_to_file %s...", datafile);
 		tStart = clock();
@@ -168,27 +205,7 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-
-	// Correct for the bwf first to get more accurate peak positions
-	SPAD_reset_timebase_shifts(w, h, t);
-	SPAD_reset_timebase_scales(w, h);
-	printf("Correcting p1 image...\n");
-	SPAD_CorrectTransients(image1, w, h, t);
-	printf("Correcting p2 image...\n");
-	SPAD_CorrectTransients(image2, w, h, t);
-
-	// Now do shifts again on bwf corrected data for accurate peak positions
-	printf("SPAD_intialise_timebase_shifts...");
-	tStart = clock();
-	ret = SPAD_intialise_timebase_shifts(image1, w, h, t);
-	printf(" time taken: %.2fs\n", ((double)clock() - (double)tStart) / CLOCKS_PER_SEC);
-	//free(image1);
-
-	if (ret < 0) {
-		printf("ERROR: %d\n", ret);
-		return(-2);
-	}
-	else {
+	{
 		char datafile[] = "timebase_shifts.dat";
 		printf("SPAD_write_timebase_shifts_to_file %s...", datafile);
 		tStart = clock();
@@ -213,19 +230,7 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-
-	// Now do scales again on bwf corrected data for accurate peak positions
-	printf("SPAD_intialise_timebase_scales...");
-	tStart = clock();
-	ret = SPAD_intialise_timebase_scales(image2, w, h, t, delta);
-	printf(" time taken: %.2fs\n", ((double)clock() - (double)tStart) / CLOCKS_PER_SEC);
-	//free(image2);
-
-	if (ret < 0) {
-		printf("ERROR: %d\n", ret);
-		return(-2);
-	}
-	else {
+	{
 		char datafile[] = "timebase_scales.dat";
 		printf("SPAD_write_timebase_scales_to_file %s...", datafile);
 		tStart = clock();
@@ -260,9 +265,6 @@ int main(int argc, char** argv)
 	IcsClose(ip);
 
 	// load p1 and p2 fresh to generate test files
-	free(image1);
-	free(image2);
-
 	printf("SPAD_load3DICSfile %s...", peak1.c_str());
 	tStart = clock();
 	ret = SPAD_load3DICSfile((char*)peak1.c_str(), &image1, &w, &h, &t);
@@ -289,12 +291,7 @@ int main(int argc, char** argv)
 	tStart = clock();
 
 	printf("Correcting p1 image...\n");
-	
 	SPAD_CorrectTransients(image1, w, h, t);
-
-	//SPAD_CorrectTransients_SingleThread(image1, w, h, t);
-
-
 	printf("Correcting p2 image...\n");
 	SPAD_CorrectTransients(image2, w, h, t);
 
@@ -319,13 +316,21 @@ int main(int argc, char** argv)
 
 	}
 
-	if (test_dump) {
+	double new_ns_per_bin = SPAD_get_calibrated_timebase();
+	if (new_ns_per_bin > 0) {   // a value was calculated
+		ns_per_bin = new_ns_per_bin;
+	}
+
+	//if (test_dump) {
 		// save the 'after' case after the final time calibration
 		add_images(image1, image2, image, w, h, t);
 
 		char imagefile2[] = "detector_peaks_after.ics";
-		SPAD_save3DICSfile(imagefile2, image, w, h, t, 5, NULL, 0, xy_microns_per_pixel, SPAD_get_calibrated_timebase());
-	}
+		SPAD_save3DICSfile(imagefile2, image, w, h, t, 5, NULL, 0, xy_microns_per_pixel, ns_per_bin);
+	
+		char imagefile3[] = "image1_after.ics";
+		SPAD_save3DICSfile(imagefile3, image1, w, h, t, 5, NULL, 0, xy_microns_per_pixel, ns_per_bin);
+	//}
 
 	printf(" time taken: %.2fs\n", ((double)clock() - (double)tStart) / CLOCKS_PER_SEC);
 

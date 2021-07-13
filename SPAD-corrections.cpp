@@ -13,7 +13,7 @@ extern double* gTimebaseScales;
 extern int gnTimebaseScales;
 
 // MSVC Binomial random number generation, 39 ms for 16x16
-/*
+
 static std::random_device rd;
 static std::mt19937_64 gen(rd());
 using BinomialDist = std::binomial_distribution<>;
@@ -25,7 +25,7 @@ int MSVC_rbinom(int n, double p)
     BinomialDist rand_binom(n, p);
     return rand_binom(gen);
 }
-*/
+
 
 // Brute force photon by photon, 17 ms for 16x16
 // Speed depends on n with large n slower
@@ -36,6 +36,7 @@ int rbinom(int n, double p)
     if (p >= 1.0) return(n);
 
 //    if (n > 5) return(MSVC_rbinom(n, p)); ????  Makes it 2x slower with my data
+    if (n > 100) return(MSVC_rbinom(n, p));
 
     int x = 0;
     int P = (int)(p * RAND_MAX);
@@ -112,16 +113,18 @@ USHORT* combined_correction(USHORT* trans, int nbins,
         t = t - f;
         n = n - N;
 
-        if (bj2 >= 0) {   // if upper bin limit is before the transient there is nothing to do
-            while (j < bj2) {
-                f = 1; // whole
-                p = f / t;
-                N = rbinom(n, p);
-                if (j >= 0 && j < nbins)
-                    new_Int[j] += N;
-                j = j + 1;
-                t = t - f;
-                n = n - N;
+        if (bj1 < nbins) {   // if lower bin limit is after the transient there is nothing to do
+            if (bj2 >= 0) {   // if upper bin limit is before the transient there is nothing to do
+                while (j < bj2) {
+                    f = 1; // whole
+                    p = f / t;
+                    N = rbinom(n, p);
+                    if (j >= 0 && j < nbins)
+                        new_Int[j] += N;
+                    j = j + 1;
+                    t = t - f;
+                    n = n - N;
+                }
             }
         }
 

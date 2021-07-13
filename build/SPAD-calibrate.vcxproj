@@ -324,6 +324,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-timebase_shifts.cpp" />
     <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-correct_IO.cpp" />
     <ClCompile Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-correct_metadata.cpp" />
+    <ClInclude Include="..\SPAD-calibrate.h" />
     <ClInclude Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-correct.h" />
     <ClInclude Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\SPAD-correct_internal.h" />
     <ClInclude Include="C:\Devel\UCL-KCL-FLIM-Histology\SPAD_correct\cmdparser.hpp" />
